@@ -1,6 +1,6 @@
 const mysql = require('mysql');
 const coneccion = mysql.createConnection({
-    host:'farmacia.mysql.database.azure.com',
+    host:'farmaciajdd.mysql.database.azure.com',
     user:'farmacia',
     password:'76515243E.',
     database:'farmacia_1'
