@@ -44,8 +44,8 @@ router.get('/ventas_p', function(req, res) {
 
 
 router.post('/ventas_p/:id?', function(req, res) {
-    const id = req.params.id; // Obtener el ID de la venta, si se proporciona
-    const opcion = req.body.opcion; // Obtener la opción (crear, editar, eliminar)
+    const id = req.params.id;
+    const opcion = req.body.opcion;
     
     switch(opcion) {
       

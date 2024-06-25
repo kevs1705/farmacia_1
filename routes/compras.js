@@ -6,7 +6,14 @@ const router = express.Router();
 const connection = require('../database/db');
 
 router.get('/compras', function(req, res) {
-    connection.query('SELECT * FROM compras ORDER BY Fecha_Compra DESC LIMIT 200;', (error, results) => {
+    connection.query(`
+        SELECT c.ID_Compra, c.Fecha_Compra, c.Total_Compra, p.Nombre AS NombreProveedor
+        FROM compras c
+        INNER JOIN proveedores p ON c.ID_Proveedor = p.ID_Proveedor
+        WHERE c.Estado IS NULL OR c.Estado != 2
+        ORDER BY c.Fecha_Compra DESC
+        LIMIT 200;
+    `, (error, results) => {
         if (error) {
             console.error('Error al obtener datos de la tabla compras:', error);
             res.status(500).send('Error al obtener datos de la tabla compras');
@@ -15,6 +22,57 @@ router.get('/compras', function(req, res) {
         }
     });
 });
+
+router.get('/detalle_compra/:id', function(req, res) {
+    var idCompra = req.params.id;
+    connection.query(`
+        SELECT c.ID_Compra, c.Fecha_Compra, c.Total_Compra, p.Nombre AS NombreProveedor,
+               dc.Cantidad_Empaque, dc.Cantidad_Unitario, dc.Fecha_Vencimiento,
+               dc.Precio_Unitario, u.Nombre AS NombreUnidadEmpaque,
+               pr.Nombre AS NombreProducto
+        FROM compras c
+        INNER JOIN proveedores p ON c.ID_Proveedor = p.ID_Proveedor
+        INNER JOIN detalles_compra dc ON c.ID_Compra = dc.ID_Compra
+        INNER JOIN unidad_empaque u ON dc.ID_Unidad_Empaque = u.ID_Unidad_Empaque
+        INNER JOIN productos pr ON dc.ID_Producto = pr.ID_Producto
+        WHERE c.ID_Compra = ?
+    `, [idCompra], (error, results) => {
+        if (error) {
+            console.error('Error al obtener detalles de la compra:', error);
+            res.status(500).send('Error al obtener detalles de la compra');
+        } else {
+            if (results.length > 0) {
+                // Agrupar detalles por cada compra
+                const compra = {
+                    ID_Compra: results[0].ID_Compra,
+                    Fecha_Compra: results[0].Fecha_Compra,
+                    Total_Compra: results[0].Total_Compra,
+                    NombreProveedor: results[0].NombreProveedor,
+                    detalles: []  // Aquí se almacenarán los detalles de productos
+                };
+
+                // Recorrer los resultados para crear objetos de detalle
+                results.forEach(row => {
+                    const detalle = {
+                        NombreProducto: row.NombreProducto,
+                        Cantidad_Empaque: row.Cantidad_Empaque,
+                        Cantidad_Unitario: row.Cantidad_Unitario,
+                        Fecha_Vencimiento: row.Fecha_Vencimiento,
+                        Precio_Unitario: row.Precio_Unitario,
+                        NombreUnidadEmpaque: row.NombreUnidadEmpaque
+                    };
+                    compra.detalles.push(detalle);  // Agregar detalle a la lista
+                });
+
+                // Renderizar la vista detalles_compras y pasar los datos
+                res.render('./compras/detalles_compras', { compra: compra });
+            } else {
+                res.status(404).send('Compra no encontrada');
+            }
+        }
+    });
+});
+
 
 router.post('/compras/:id?', function(req, res) {
     const id = req.params.id;
@@ -52,7 +110,7 @@ router.post('/compras/:id?', function(req, res) {
             });
             break;
         case 'eliminar':
-            connection.query('DELETE FROM compras WHERE ID_Compra = ?', id, (error, result) => {
+            connection.query('UPDATE compras SET Estado = 2 WHERE ID_Compra = ?', id, (error, result) => {
                 if (error) {
                     console.error('Error al eliminar la compra:', error);
                     res.status(500).send('Error al eliminar la compra');

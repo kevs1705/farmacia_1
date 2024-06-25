@@ -56,6 +56,7 @@ const impre_clientes = require('./routes/impre_clientes');
 
 //papeleria
 const ventas_pRouter = require('./papeleria/ventas');
+const compras_pRouter = require('./papeleria/compras');
 
 
 
@@ -364,6 +365,7 @@ app.use(graficosRouter);
 //papeleria
 
 app.use(ventas_pRouter);
+app.use(compras_pRouter);
 
 
 

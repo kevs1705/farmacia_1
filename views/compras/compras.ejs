@@ -64,54 +64,31 @@
             </thead>
             <tbody>
               <% results.forEach(function(compra) { %>
-                <tr>
-                  <td class="text-center"><%= compra.ID_Compra %></td>
-                  <td class="text-center"><%= compra.Fecha_Compra %></td>
-                  <td class="text-center"><%= compra.Total_Compra %></td>
-                  <td class="text-center"><%= compra.ID_Proveedor %></td>
-                  <td>
-                    <div class="text-center">
-                      <div class="btn-group">
-                        <a href="#" class="btn btn-sm btnBorrar"><img src="resources/images/iconos/delete.svg" alt="Eliminar"></a>
-                        <a href="#" class="btn btn-sm btnCopiar"><img src="resources/images/iconos/copy.svg" alt="Copiar"></a>
-                      </div>
-                    
-                    </div>
-                  </td>
-                </tr>
+                  <tr>
+                      <td class="text-center"><%= compra.ID_Compra %></td>
+                      <td class="text-center"><%= compra.Fecha_Compra %></td>
+                      <td class="text-center"><%= compra.Total_Compra %></td>
+                      <td class="text-center"><%= compra.NombreProveedor %></td>
+                      <td>
+                          <div class="text-center">
+                              <div class="btn-group">
+                                  <a href="/detalle_compra/<%= compra.ID_Compra %>" class="btn btn-sm btnDetalle"><img src="resources/images/iconos/detalles.svg" alt="detalles"></a>
+                                  <a href="#" class="btn btn-sm btnBorrar"><img src="resources/images/iconos/delete.svg" alt="Eliminar"></a>
+                                  <a href="#" class="btn btn-sm btnCopiar"><img src="resources/images/iconos/copy.svg" alt="Copiar"></a>
+                              </div>
+                          </div>
+                      </td>
+                  </tr>
               <% }); %>
-            </tbody>
+          </tbody>
+          
+          
           </table>
         </div>
       </div>
     </div>
   
-   <!--Modal para CRUD-->
-  <div id="modalCRUD" class="modal fade" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel"></h5>
-        </div>
-        <form id="formCompras">
-          <div class="modal-body">
-            <input type="text" class="form-control" id="ID_Compra" hidden />
-            <label for="Fecha" class="col-form-label">Fecha de Compra</label>
-            <input type="date" class="form-control" id="Fecha" />
-            <label for="Total_Compra" class="col-form-label">Total de Compra</label>
-            <input type="number" class="form-control" id="Total_Compra" />
-            <label for="ID_Proveedor" class="col-form-label">ID Proveedor</label>
-            <input type="number" class="form-control" id="ID_Proveedor" />
-  
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
-            <button type="submit" id="btnGuardar" class="btn btn-success">Guardar</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
+
   
   <!-- Tus scripts de JavaScript -->
   <script type="text/javascript" language="javascript" src="https://code.jquery.com/jquery-3.5.1.js"></script>

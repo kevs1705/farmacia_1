@@ -38,6 +38,57 @@ router.get('/ventas', function(req, res) {
     });
 });
 
+// Ruta para mostrar los detalles de una venta
+// Ruta para mostrar los detalles de una venta
+router.get('/detalle_venta/:id', function(req, res) {
+    var idVenta = req.params.id;
+    connection.query(`
+        SELECT v.ID_Venta, v.Fecha_Venta, v.Total_Venta, v.ID_Cliente,
+               c.Nombre AS NombreCliente, e.Nombre AS NombreEmpleado,
+               dv.Cantidad, p.Nombre AS NombreProducto, p.Precio_Unitario
+        FROM ventas v
+        INNER JOIN clientes c ON v.ID_Cliente = c.ID_Cliente
+        INNER JOIN empleados e ON v.ID_Empleado = e.ID_Empleado
+        INNER JOIN detalles_venta dv ON v.ID_Venta = dv.ID_Venta
+        INNER JOIN productos p ON dv.ID_Producto = p.ID_Producto
+        WHERE v.ID_Venta = ?
+    `, [idVenta], (error, results) => {
+        if (error) {
+            console.error('Error al obtener detalles de la venta:', error);
+            res.status(500).send('Error al obtener detalles de la venta');
+        } else {
+            if (results.length > 0) {
+                // Agrupar detalles por cada venta
+                const venta = {
+                    ID_Venta: results[0].ID_Venta,
+                    Fecha_Venta: results[0].Fecha_Venta,
+                    Total_Venta: results[0].Total_Venta,
+                    ID_Cliente: results[0].ID_Cliente,
+                    NombreCliente: results[0].NombreCliente,
+                    NombreEmpleado: results[0].NombreEmpleado,
+                    detalles: []  // Aquí se almacenarán los detalles de productos
+                };
+
+                // Recorrer los resultados para crear objetos de detalle
+                results.forEach(row => {
+                    const detalle = {
+                        NombreProducto: row.NombreProducto,
+                        Cantidad: row.Cantidad,
+                        Precio_Unitario: row.Precio_Unitario
+                        // Agrega más campos si es necesario según tu estructura de datos
+                    };
+                    venta.detalles.push(detalle);  // Agregar detalle a la lista
+                });
+
+                // Renderizar la vista detalles_venta y pasar los datos
+                res.render('./ventas/detalles_ventas', { venta: venta });
+            } else {
+                res.status(404).send('Venta no encontrada');
+            }
+        }
+    });
+});
+
 
 
 router.post('/ventas/:id?', function(req, res) {
